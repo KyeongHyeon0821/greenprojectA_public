@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>센서 데이터 엑셀 내보내기</title>
+  <style>
+    form {
+      margin-bottom: 20px;
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      align-items: center;
+    }
+
+    label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      color: #333;
+      min-width: 200px;
+    }
+
+    select,
+    input[type="date"],
+    input[type="datetime-local"] {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a242f;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    .message, .error {
+      color: gray;
+      text-align: center;
+      height: 300px;
+      line-height: 1.5;
+      padding: 80px 10px; /* 위아래 여백 확보 */
+      font-size: 16px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+<div th:replace="~{include/header::header}"></div>
+
+<h2>데이터 다운로드</h2>
+
+<form id="exportForm">
+  <label for="deviceCode">센서 위치
+    <select id="deviceCode" name="deviceCode">
+      <option value="">전체</option>
+      <option value="ENV_V2_1">1F</option>
+      <option value="ENV_V2_2">2F</option>
+      <option value="ENV_V2_3">자재실</option>
+      <option value="ENV_V2_4">포장실</option>
+    </select>
+  </label>
+
+  <label for="startDate">시작일
+    <input type="datetime-local" id="startDate" name="startDate" required>
+  </label>
+
+  <label for="endDate">종료일
+    <input type="datetime-local" id="endDate" name="endDate" required>
+  </label>
+
+  <button type="submit">엑셀 다운로드</button>
+</form>
+
+<h3>미리보기 (최대 100개 행)</h3>
+<table>
+  <thead>
+  <tr>
+    <th>측정일시</th>
+    <th>디바이스코드</th>
+    <th>실내온도</th>
+    <th>상대습도</th>
+    <th>이산화탄소</th>
+    <th>VOC</th>
+    <th>PM1.0</th>
+    <th>PM2.5</th>
+    <th>PM10</th>
+    <th>냉장고_온도1</th>
+    <th>냉장고_온도2</th>
+    <th>냉장고_온도3</th>
+    <th>소음</th>
+    <th>비접촉온도</th>
+    <th>조도</th>
+  </tr>
+  </thead>
+  <tbody id="previewTable">
+    <tr>
+      <td colspan="15" class="message">데이터를 선택하면 미리보기가 여기에 표시됩니다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<script>
+  // 엑셀 다운로드
+  document.getElementById("exportForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const deviceCode = document.getElementById("deviceCode").value;
+
+    if (startDate > endDate) {
+      alert("종료일은 시작일보다 늦어야 합니다.");
+      return;
+    }
+
+    const params = new URLSearchParams({ startDate, endDate });
+    if (deviceCode) params.append("deviceCode", deviceCode);
+
+    window.location.href = `/sensor/export-page/export?${params.toString()}`;
+  });
+
+  // 미리보기
+  document.getElementById("deviceCode").addEventListener("change", previewData);
+  document.getElementById("startDate").addEventListener("change", previewData);
+  document.getElementById("endDate").addEventListener("change", previewData);
+
+  function previewData() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const deviceCode = document.getElementById("deviceCode").value;
+    const tableBody = document.getElementById("previewTable");
+
+    if (!startDate || !endDate) {
+      tableBody.innerHTML = `<tr><td colspan="15" class="message">데이터를 선택하면 미리보기가 여기에 표시됩니다.</td></tr>`;
+      return;
+    }
+
+    if (startDate > endDate) {
+      tableBody.innerHTML = `<tr><td colspan="15" class="error">시작일은 종료일보다 이전이어야 합니다.</td></tr>`;
+      return;
+    }
+
+    const params = new URLSearchParams({ startDate, endDate });
+    if (deviceCode) params.append("deviceCode", deviceCode);
+
+    fetch(`/sensor/export-page/preview?${params.toString()}`)
+      .then(response => response.json())
+      .then(data => {
+        tableBody.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="15" class="message">해당 기간의 데이터가 없습니다.</td></tr>`;
+          return;
+        }
+
+        data.slice(0, 100).forEach(sensor => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${sensor.measureDatetime.replace("T", " ")}</td>
+            <td>${sensor.deviceCode}</td>
+            <td>${sensor.value1 ?? ""}</td>
+            <td>${sensor.value2 ?? ""}</td>
+            <td>${sensor.value3 ?? ""}</td>
+            <td>${sensor.value4 ?? ""}</td>
+            <td>${sensor.value5 ?? ""}</td>
+            <td>${sensor.value6 ?? ""}</td>
+            <td>${sensor.value7 ?? ""}</td>
+            <td>${sensor.value8 ?? ""}</td>
+            <td>${sensor.value9 ?? ""}</td>
+            <td>${sensor.value10 ?? ""}</td>
+            <td>${sensor.value11 ?? ""}</td>
+            <td>${sensor.value12 ?? ""}</td>
+            <td>${sensor.value13 ?? ""}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error("미리보기 오류", error);
+        tableBody.innerHTML = `<tr><td colspan="15" class="error">미리보기를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+      });
+  }
+</script>
+<div th:replace="include/footer :: footer"></div>
+</body>
+</html>

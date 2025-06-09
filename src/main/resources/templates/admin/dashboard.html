@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="css">
+  <style>
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-header h2 {
+      margin-bottom: 10px;
+    }
+
+    .dashboard-header .time {
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 30px;
+    }
+
+    .dashboard-container {
+      flex: 3;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .dashboard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .device-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .weather-box {
+      flex: 1;
+      background: #eef1f5;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      height: fit-content;
+    }
+
+    .device-group {
+      margin-bottom: 30px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .sensor-card {
+      height: 150px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sensor-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .sensor-location {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .sensor-label {
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    .normal {
+      background-color: #d8f5d8; /* 녹색: 정상 */
+    }
+
+    .warning {
+      background-color: #fcdede; /* 빨강: 이벤트 발생 */
+    }
+
+    /* 날씨 관련 스타일 */
+
+    .weather-card {
+      max-width: 260px;
+      padding: 1.5rem;
+      margin: 1rem auto;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #8ec5fc, #e0c3fc);
+      color: #fff;
+      font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .weather-location {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .weather-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .weather-icon {
+      width: 70px;
+      height: 70px;
+    }
+
+    .weather-desc {
+      font-size: 1rem;
+      margin-top: 0.3rem;
+      text-transform: capitalize;
+    }
+
+    .weather-info {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .temperature {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .humidity {
+      font-size: 0.95rem;
+      align-self: center;
+    }
+
+  </style>
+</th:block>
+
+<div layout:fragment="content" class="container mt-5 mb-5">
+  <div class="dashboard-header">
+    <span class="header-title">EcoMonitor Dashboard</span>
+    <span class="time" id="currentTime"></span>
+  </div>
+
+  <div class="main-layout">
+    <div class="dashboard-container">
+      <div class="dashboard-top">
+        <div class="dashboard-title">Sensor Data</div>
+        <div class="device-filter">
+          <label for="deviceFilter">디바이스 선택: </label>
+          <select id="deviceFilter">
+            <option value="ALL">전체</option>
+            <!-- 디바이스 목록 셀렉트 박스 -->
+            <th:block th:each="device : ${deviceList}">
+              <option th:value="${device.deviceCode}" th:text="${device.deviceLocation}"></option>
+            </th:block>
+          </select>
+        </div>
+      </div>
+      <div id="dashboard"></div>
+    </div>
+
+    <div class="weather-box">
+      <div id="weather"></div>
+    </div>
+  </div>
+
+</div>
+
+<th:block layout:fragment="script">
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=f5f016ee8ec4b87750154cd5e9d07dfb&libraries=services"></script>
+  <script th:inline="javascript">
+    let deviceList = /*[[${deviceList}]]*/ [];
+
+    const valueLabels = [
+      "실내온도", "상대습도", "이산화탄소", "유기화합물VOC",
+      "초미세먼지(PM1.0)", "초미세먼지(PM2.5)", "미세먼지(PM10)",
+      "냉장고_온도1", "냉장고_온도2", "냉장고_온도3"
+    ];
+
+    // deviceList에서 deviceCode → deviceLocation 매핑 객체 만들기
+    const deviceMap = {};
+    deviceList.forEach(device => {
+      deviceMap[device.deviceCode] = device.deviceLocation;
+    });
+
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('currentTime').innerText = now.toLocaleString('ko-KR');
+    }
+
+    function fetchLatestData() {
+      $.ajax({
+        url: '/admin/getLatestData',
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+          renderDashboard(res);
+        },
+        error: function(err) {
+          console.error('데이터 불러오기 실패:', err);
+        }
+      });
+    }
+
+    function renderDashboard(sensorList) {
+      const selectedDevice = $('#deviceFilter').val();
+      const dashboard = $('#dashboard');
+      dashboard.empty();
+
+      if (!sensorList || sensorList.length === 0) {
+        dashboard.append('<p style="text-align:center; color:#999;">센서 데이터가 없습니다.</p>');
+        return;
+      }
+
+      if (selectedDevice === 'ALL') {
+        const grouped = {};
+        sensorList.forEach(s => {
+          if (!grouped[s.deviceCode]) grouped[s.deviceCode] = [];
+          grouped[s.deviceCode].push(s);
+        });
+
+        for (const [deviceCode, sensors] of Object.entries(grouped)) {
+          const groupDiv = $('<div class="device-group"></div>');
+          const grid = $('<div class="dashboard"></div>');
+
+          sensors.forEach(sensor => {
+            for (let i = 1; i <= 10; i++) {
+              const value = sensor['value' + i];
+              const eventFlag = sensor['value' + i + 'Event'];
+              const label = valueLabels[i - 1];
+              const bgClass = eventFlag ? 'warning' : 'normal';
+
+              const card = $(`
+                <div class="sensor-card ${bgClass}">
+                  <div class="sensor-label">${label}</div>
+                  <div class="sensor-value">${value}</div>
+                  <div class="sensor-location">${deviceMap[deviceCode] || deviceCode}</div>
+                </div>
+              `);
+              grid.append(card);
+            }
+          });
+
+          groupDiv.append(grid);
+          dashboard.append(groupDiv);
+        }
+
+      } else {
+        const selected = sensorList.find(s => s.deviceCode === selectedDevice);
+        if (!selected) return;
+
+        const grid = $('<div class="dashboard"></div>');
+
+        for (let i = 1; i <= 10; i++) {
+          const value = selected['value' + i];
+          const eventFlag = selected['value' + i + 'Event'];
+          const label = valueLabels[i - 1];
+          const bgClass = eventFlag ? 'warning' : 'normal';
+
+          const card = $(`
+            <div class="sensor-card ${bgClass}">
+              <div class="sensor-label">${label}</div>
+              <div class="sensor-value">${value}</div>
+              <div class="sensor-location">${deviceMap[selectedDevice] || selectedDevice}</div>
+            </div>
+          `);
+          grid.append(card);
+        }
+
+        dashboard.append(grid);
+      }
+    }
+
+    $(document).ready(function() {
+      updateTime();
+      setInterval(updateTime, 1000);
+      fetchLatestData();
+      setInterval(fetchLatestData, 10000);
+      $('#deviceFilter').on('change', fetchLatestData);
+    });
+
+
+    // 날씨 api
+    const companyAddress = [[${company.location}]];
+
+    // 1. 주소 → 좌표 변환
+    function getLatLngFromAddress(address, callback) {
+      const geocoder = new kakao.maps.services.Geocoder();
+      geocoder.addressSearch(address, function(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+          const lat = result[0].y;
+          const lng = result[0].x;
+          callback(lat, lng);
+        } else {
+          console.error("주소 → 좌표 변환 실패");
+        }
+      });
+    }
+
+  // 2. 좌표 → 날씨 정보 가져오기
+  function fetchWeather(lat, lon) {
+    const apiKey = '1e7753ae7a7e974631a0f7a41e9e8b8d';
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        // 콘솔 확인
+        console.log("날씨 데이터:", data);
+
+        // 예시: 날씨 정보 화면에 표시
+        const weatherDescription = data.weather[0].description; // 흐림, 맑음 등
+        const temperature = data.main.temp; // 현재 온도
+        const weatherIcon = data.weather[0].icon; // 아이콘 코드
+        const humidity = data.main.humidity; // 습도 (%)
+        const cityName = data.name; // 도시 이름
+
+        document.getElementById("weather").innerHTML = `
+          <div class="weather-location">${cityName}</div>
+          <div class="weather-main">
+            <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" alt="날씨 아이콘" class="weather-icon">
+            <div class="weather-desc">${weatherDescription}</div>
+          </div>
+          <div class="weather-info">
+            <div class="temperature">${Math.round(temperature)}°C</div>
+            <div class="humidity">습도 ${humidity}%</div>
+          </div>
+        `;
+      })
+      .catch(error => {
+        console.error("날씨 정보 가져오기 실패:", error);
+      });
+    }
+
+    // 3. 실행: 주소로 날씨 가져오기
+    document.addEventListener("DOMContentLoaded", function() {
+      getLatLngFromAddress(companyAddress, fetchWeather);
+    });
+  </script>
+</th:block>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<div layout:fragment="script">
+    <!--<script th:inline="javascript">-->
+    <script>
+      var message = '[[${message}]]';
+      var url = '[[${url}]]';
+      if(message != null) alert(message);
+      location.href = url;
+    </script>
+</div>
+
+</html>

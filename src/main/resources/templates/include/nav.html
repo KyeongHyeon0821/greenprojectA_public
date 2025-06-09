@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="nav">
+    <header style="background-color: #fff; border-bottom: 1px solid #e9ecef; padding: 24px 5%; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 100;">
+        <!-- 로고 -->
+        <div class="nav-logo" style="font-weight: 800; font-size: 1.8rem; color: #2c3e50; display: flex; align-items: center;">
+            <a th:href="@{/}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                <img src="/images/logo.png" alt="EcoView 로고" style="height: 32px; vertical-align: middle;">
+                <span style="line-height: 1;">EcoView</span>
+            </a>
+        </div>
+
+        <!-- 네비 메뉴 -->
+        <nav>
+            <ul style="list-style: none; display: flex; gap: 40px; margin: 0; padding: 0;">
+                <li class="dropdown">
+                    <a href="#" class="nav-link">회사소개</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">CEO 인사말</a></li>
+                        <li><a href="#">비전</a></li>
+                        <li><a href="#">연혁</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">서비스</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">데이터 분석</a></li>
+                        <li><a href="#">회원 관리</a></li>
+                        <li><a href="#">보안 시스템</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link">고객지원</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">문의하기</a></li>
+                        <li><a href="#">자료실</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 사용자 메뉴 -->
+        <div class="user-menu" style="display: flex; gap: 16px;">
+            <a th:href="@{/member/memberLogin}" sec:authorize="isAnonymous()" class="user-link">Login</a>
+            <a th:href="@{/member/memberJoin}" sec:authorize="isAnonymous()" class="user-link">Join</a>
+            <a th:href="@{/biz/bizMenu}" sec:authorize="hasAuthority('ROLE_USER')" class="user-link">사업장 모니터링</a>
+            <a th:href="@{/member/mypage}" sec:authorize="hasAuthority('ROLE_USER')" class="user-link">마이페이지</a>
+            <a th:href="@{/admin/adminMenu}" sec:authorize="hasAuthority('ROLE_ADMIN')" class="user-link">관리자페이지</a>
+            <a th:href="@{/member/memberLogout}" sec:authorize="isAuthenticated()" class="user-link">Logout</a>
+        </div>
+    </header>
+
+    <!-- 드롭다운 CSS -->
+    <style>
+        .nav-link {
+          text-decoration: none;
+          color: #212529;
+          font-weight: 500;
+          padding: 8px 12px;
+          display: block;
+        }
+
+        .dropdown {
+          position: relative;
+        }
+
+        .dropdown-menu {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #fff;
+          border: 1px solid #dee2e6;
+          border-radius: 6px;
+          min-width: 180px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          z-index: 1000;
+        }
+
+        .dropdown-menu li a {
+          display: block;
+          padding: 10px 16px;
+          color: #495057;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .dropdown:hover .dropdown-menu {
+          display: block;
+        }
+
+        .dropdown-menu li a:hover {
+          background-color: #f1f3f5;
+        }
+
+        .user-link {
+          text-decoration: none;
+          color: #2c3e50;
+          font-weight: 500;
+        }
+
+
+    </style>
+</th:block>
+</html>

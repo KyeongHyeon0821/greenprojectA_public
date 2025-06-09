@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 찾기</title>
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --bg-color: #f4f6f8;
+    }
+
+    html, body {
+      padding: 0;
+      height: 100%;
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg-color);
+      overflow: hidden;
+    }
+
+    .popup-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--bg-color);
+    }
+
+    .popup-container {
+      width: 100%;
+      max-width: 460px;
+      padding: 36px 24px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .popup-container h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--main-color);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-control,
+    .form-select {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    #mid {
+      width: 100%;
+      padding-right: 14px;
+      box-sizing: border-box;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .input-group input[type="text"],
+    .input-group select {
+      flex: 1;
+    }
+
+    .btn-submit {
+      cursor: pointer;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      background-color: var(--main-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .btn-submit:hover {
+      background-color: #1f2f3d;
+    }
+
+    .alert-success,
+    .alert-danger {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      color: #2e7d32;
+    }
+
+    .alert-danger {
+      color: #c62828;
+    }
+  </style>
+</head>
+
+<body>
+<div class="popup-wrapper">
+  <div class="popup-container">
+    <h3>비밀번호 찾기</h3>
+
+    <form method="post" th:action="@{/member/findPwd}" onsubmit="return validateForm();">
+      <div class="form-group">
+        <label for="mid">아이디</label>
+        <input type="text" id="mid" name="mid" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="email1">이메일</label>
+        <div class="input-group">
+          <input type="text" id="email1" name="email1" class="form-control" placeholder="이메일 아이디">
+          <span class="input-group-text">@</span>
+          <select id="email2" name="email2" class="form-select">
+            <option value="naver.com">naver.com</option>
+            <option value="gmail.com">gmail.com</option>
+            <option value="hanmail.net">hanmail.net</option>
+            <option value="daum.net">daum.net</option>
+            <option value="nate.com">nate.com</option>
+            <option value="hotmail.com">hotmail.com</option>
+            <option value="yahoo.com">yahoo.com</option>
+          </select>
+        </div>
+      </div>
+
+      <input type="hidden" id="emailHidden" name="email">
+      <button type="submit" class="btn-submit">인증메일 보내기</button>
+    </form>
+
+    <div th:if="${message != null}" class="alert-success" th:text="${message}"></div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  function validateForm() {
+    const mid = document.getElementById("mid").value.trim();
+    const email1 = document.getElementById("email1").value.trim();
+    const email2 = document.getElementById("email2").value;
+    const email = email1 + "@" + email2;
+
+    const midPattern = /^[a-zA-Z0-9_-]{4,20}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    document.getElementById("emailHidden").value = email;
+
+    if (!mid || !midPattern.test(mid)) {
+      alert("아이디를 정확히 입력해주세요.");
+      return false;
+    }
+    if (!email1 || !emailPattern.test(email)) {
+      alert("이메일 형식이 올바르지 않습니다.");
+      return false;
+    }
+    return true;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const msg = /*[[${message != null}]]*/ false ? [[${message}]] : null;
+
+    if (msg) {
+      const plain = String(msg).replaceAll("\\n", "\n");
+      alert(plain);
+
+      if (plain.includes("임시 비밀번호가 이메일로 발송되었습니다")) {
+        if (window.opener && !window.opener.closed) {
+          window.opener.location.href = "/member/memberLogin";
+        }
+        setTimeout(() => {
+          window.close();
+          }, 200);
+      }
+    }
+  });
+</script>
+</body>
+</html>

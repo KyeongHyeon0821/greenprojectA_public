@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>아이디 찾기</title>
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --bg-color: #f4f6f8;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg-color);
+      overflow: hidden;
+    }
+
+    .popup-wrapper {
+      background-color: var(--bg-color);
+      align-items: center;
+      padding: 10px 10px 10px 10px;
+    }
+
+    .popup-container {
+      max-width: 460px;
+      padding: 36px 24px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .popup-container h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--main-color);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-control,
+    .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      height: 42px;
+      box-sizing: border-box;
+    }
+
+    #name {
+      padding-right: 14px; /* 오른쪽 정렬 맞춤 */
+    }
+
+    .input-group {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .input-group input[type="text"],
+    .input-group select {
+      flex: 1;
+    }
+
+    .input-group-text {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 1rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      background-color: var(--main-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      background-color: #1f2f3d;
+    }
+
+    .alert-success,
+    .alert-danger {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      color: #2e7d32;
+    }
+
+    .alert-danger {
+      color: #c62828;
+    }
+  </style>
+</head>
+
+<body>
+<div class="popup-wrapper">
+  <div class="popup-container">
+    <h3>아이디 찾기</h3>
+
+    <form th:action="@{/member/findId}" method="post" onsubmit="return validateForm();">
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input type="text" name="username" id="name" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="email1">이메일</label>
+        <div class="input-group">
+          <input type="text" name="email1" id="email1" class="form-control" placeholder="이메일 아이디">
+          <span class="input-group-text">@</span>
+          <select name="email2" id="email2" class="form-select">
+            <option value="naver.com">naver.com</option>
+            <option value="hanmail.net">hanmail.net</option>
+            <option value="gmail.com">gmail.com</option>
+            <option value="daum.net">daum.net</option>
+            <option value="yahoo.com">yahoo.com</option>
+            <option value="hotmail.com">hotmail.com</option>
+            <option value="nate.com">nate.com</option>
+          </select>
+        </div>
+      </div>
+
+      <input type="hidden" id="fullEmail" name="email">
+      <button type="submit" class="btn-submit">아이디 찾기</button>
+
+      <div th:if="${foundId != null}" class="alert-success">
+        회원님의 아이디는 <strong th:text="${foundId}"></strong> 입니다.
+      </div>
+      <div th:if="${notFound}" class="alert-danger">
+        일치하는 회원 정보가 없습니다.
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function validateForm() {
+    const name = document.getElementById("name").value.trim();
+    const email1 = document.getElementById("email1").value.trim();
+    const email2 = document.getElementById("email2").value;
+    const fullEmail = email1 + "@" + email2;
+    document.getElementById("fullEmail").value = fullEmail;
+
+    const namePattern = /^[\uAC00-\uD7A3a-zA-Z]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name) {
+      alert("이름을 입력해주세요.");
+      return false;
+    }
+    if (!namePattern.test(name)) {
+      alert("이름은 한글 또는 영문만 입력 가능합니다.");
+      return false;
+    }
+    if (!email1) {
+      alert("이메일을 입력해주세요.");
+      return false;
+    }
+    if (!emailPattern.test(fullEmail)) {
+      alert("이메일 형식이 올바르지 않습니다.");
+      return false;
+    }
+    return true;
+  }
+</script>
+</body>
+</html>

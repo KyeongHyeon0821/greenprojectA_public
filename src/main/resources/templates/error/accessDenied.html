@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<div layout:fragment="content" style="padding: 80px 20px; text-align: center; color: #495057; font-family: 'Noto Sans KR', sans-serif;">
+  <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 20px;">접근 권한이 없습니다</h2>
+  <p style="font-size: 1rem; color: #868e96; margin-bottom: 40px;">
+    요청하신 페이지에 접근할 수 있는 권한이 없습니다.<br>
+    홈으로 돌아가시거나 다른 메뉴를 이용해 주세요.
+  </p>
+  <a th:href="@{/}" style="padding: 12px 24px; background-color: #38b000; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">
+    홈으로 돌아가기
+  </a>
+</div>
+
+</html>

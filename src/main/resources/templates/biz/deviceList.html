@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="css">
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --hover-color: #1f2f3d;
+      --bg-color: #f4f6f8;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg-color);
+    }
+
+    .container-wrapper {
+      max-width: 1200px;
+      padding: 40px 30px;
+      margin: 60px auto 120px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    h2, h5 {
+      color: var(--main-color);
+    }
+
+    .btn {
+      border-radius: 12px;
+      font-size: 0.95rem;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: var(--main-color);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--hover-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #f0f2f5;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #ddd;
+    }
+
+    .no-data {
+      padding: 20px;
+      text-align: center;
+      color: #999;
+    }
+  </style>
+
+</th:block>
+
+<div layout:fragment="content" class="container text-center mt-5 mb-5" style="min-height:700px;">
+  <h4 class="mb-4">디바이스 리스트</h4>
+
+  <table class="table table-striped">
+    <tr>
+      <th>번호</th>
+      <th>디바이스 코드</th>
+      <th>위치</th>
+      <th>임계값 설정</th>
+    </tr>
+    <tr th:each="device, st : ${deviceList}">
+      <td th:text="${deviceList.size() - st.index}"></td>
+      <td th:text="${device.deviceCode}"></td>
+      <td th:text="${device.deviceLocation}"></td>
+      <td>
+        <a th:href="@{/biz/thresholdUpdate/{deviceCode}(deviceCode=${device.deviceCode})}" class="btn btn-sm btn-primary">설정</a>
+      </td>
+    </tr>
+    <th:block th:if="${#lists.isEmpty(deviceList)}">
+      <tr>
+        <td colspan="4">등록된 디바이스가 없습니다.</td>
+      </tr>
+    </th:block>
+  </table>
+</div>
+
+</html>

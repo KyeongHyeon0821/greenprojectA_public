@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="script">
+  <script th:if="${message != null}" th:inline="javascript">
+    alert([[${message}]]);
+  </script>
+</th:block>
+
+  <div layout:fragment="content" class="container text-center">
+  <h2>회원 전용방 입니다.</h2>
+  <p>현재 <span style="color:blue" th:text="${session.sName}"></span>회원님의 등급은 <span style="color:red" th:text="${session.strLevel}"></span> 입니다.</p>
+  <div>
+    <a th:href="@{/}" class="btn btn-success">홈으로</a>
+  </div>
+</div>
+</html>

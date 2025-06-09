@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="css">
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --accent-color: #2e7d32;
+      --bg-color: #f4f6f8;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg-color);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 16px;
+    }
+
+    .mypage-container {
+      width: 100%;
+      max-width: 600px;
+      padding: 40px 30px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .mypage-container h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--main-color);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .btn-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .btn-list a {
+      display: block;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 12px;
+      text-align: center;
+      background-color: #2c3e50;
+      color: #fff;
+      transition: background-color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-list a:hover {
+      background-color: #1f2f3d;
+      color: #fff;
+    }
+  </style>
+</th:block>
+
+<th:block layout:fragment="content">
+  <main>
+    <div class="mypage-container">
+      <th:block th:if="${message != null}">
+        <script th:inline="javascript">
+          alert([[${message}]]);
+        </script>
+      </th:block>
+
+      <h2>마이페이지</h2>
+
+      <div class="btn-list">
+        <a href="/member/mypage/info">회원정보 수정</a>
+        <a href="/member/mypage/changePwd">비밀번호 변경</a>
+      </div>
+    </div>
+  </main>
+</th:block>
+</html>

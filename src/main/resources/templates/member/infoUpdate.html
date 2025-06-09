@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="css">
+    <style>
+        :root {
+          --main-color: #2c3e50;
+          --hover-color: #1f2f3d;
+          --bg-color: #f4f6f8;
+        }
+
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          font-family: 'Pretendard', sans-serif;
+          background-color: var(--bg-color);
+        }
+
+        body {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+
+        main {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 60px 16px;
+        }
+
+        .form-box {
+          width: 100%;
+          max-width: 700px;
+          padding: 40px 30px;
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .form-box h2 {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--main-color);
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .btn-submit {
+          background-color: var(--main-color);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 1rem;
+          padding: 12px 0;
+          transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+          background-color: var(--hover-color);
+        }
+
+        .btn-cancel {
+          background-color: #6c757d;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 1rem;
+          padding: 12px 0;
+        }
+
+        .btn-small {
+          font-size: 0.95rem;
+          border-radius: 8px;
+          padding: 6px 12px;
+        }
+
+        .btn-submit,
+        .btn-cancel,
+        .btn-cancel.btn-sm,
+        #emailCodeDiv button {
+          font-size: 0.85rem !important;
+          padding: 6px 10px !important;
+          border-radius: 12px !important;
+          line-height: 1.2 !important;
+        }
+
+        .withdraw-link {
+          text-align: right;
+          margin-top: 24px;
+          font-size: 0.9rem;
+        }
+
+        .withdraw-link button {
+          background: none;
+          border: none;
+          color: #6c757d;
+          text-decoration: underline;
+          padding: 0;
+          font-size: 0.9rem;
+          cursor: pointer;
+        }
+
+        .withdraw-link button:hover {
+          color: #495057;
+        }
+    </style>
+</th:block>
+
+<th:block layout:fragment="content">
+    <main>
+        <div class="form-box">
+            <th:block th:if="${message != null}">
+                <script th:inline="javascript"> alert([[${message}]]); </script>
+            </th:block>
+
+            <h2>회원정보 수정</h2>
+
+            <form method="post" th:action="@{/member/memberUpdate}" th:object="${member}" onsubmit="return validateForm();">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" th:field="*{idx}" />
+                <input type="hidden" th:field="*{email}" id="emailInput" />
+                <input type="hidden" th:field="*{tel}" id="tel" />
+                <input type="hidden" th:field="*{address}" id="address" />
+                <input type="hidden" id="emailVerified" name="emailVerified" value="false" />
+
+                <div class="form-group mb-3">
+                    <label>아이디</label>
+                    <input type="text" th:field="*{mid}" class="form-control" readonly>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>이름</label>
+                    <input type="text" th:field="*{username}" class="form-control" readonly>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>이메일</label>
+                    <div class="input-group">
+                        <input type="text" id="email1" class="form-control" placeholder="이메일 앞자리">
+                        <span class="input-group-text">@</span>
+                        <select id="email2" class="form-select">
+                            <option>naver.com</option>
+                            <option>gmail.com</option>
+                            <option>daum.net</option>
+                            <option>nate.com</option>
+                        </select>
+                        <button type="button" class="btn btn-submit ms-2" onclick="sendEmailCode()">인증번호받기</button>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3" id="emailCodeDiv" style="display: none;">
+                    <label>인증번호 입력</label>
+                    <div class="input-group">
+                        <input type="text" id="emailCodeInput" class="form-control" placeholder="인증번호 입력">
+                        <button type="button" class="btn btn-cancel" onclick="checkEmailCode()">확인</button>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>전화번호</label>
+                    <div class="input-group">
+                        <select id="tel1" class="form-select">
+                            <option value="010" selected>010</option>
+                            <option value="02">02</option>
+                            <option value="031">031</option>
+                        </select>
+                        <span class="input-group-text">-</span>
+                        <input type="text" id="tel2" class="form-control">
+                        <span class="input-group-text">-</span>
+                        <input type="text" id="tel3" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>주소</label>
+                    <div class="input-group mb-2">
+                        <input type="text" id="sample6_postcode" placeholder="우편번호" class="form-control">
+                        <button type="button" onclick="sample6_execDaumPostcode()" class="btn btn-cancel btn-sm ms-2">우편번호 찾기</button>
+                    </div>
+                    <input type="text" id="sample6_address" placeholder="주소" class="form-control mb-2">
+                    <div class="input-group">
+                        <input type="text" id="sample6_detailAddress" placeholder="상세주소" class="form-control me-1">
+                        <input type="text" id="sample6_extraAddress" placeholder="동/건물명" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>소속 기업</label>
+                    <input type="text" th:value="${member.company != null ? member.company.name : '소속 없음'}" class="form-control" readonly>
+                </div>
+
+                <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-submit w-25">정보 수정</button>
+                    <a href="/member/memberMain" class="btn btn-cancel w-25">돌아가기</a>
+                </div>
+            </form>
+
+            <div class="withdraw-link">
+                <form th:action="@{/member/withdraw}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" onclick="return confirm('정말 탈퇴하시겠습니까?\n회원정보는 7일의 유예기간 후 완전히 삭제됩니다.')">
+                        회원 탈퇴
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const email = document.getElementById("emailInput").value;
+          if (email.includes("@")) {
+            const [e1, e2] = email.split("@");
+            document.getElementById("email1").value = e1;
+            document.getElementById("email2").value = e2;
+          }
+
+          const tel = document.getElementById("tel").value;
+          if (tel && tel.split("-").length === 3) {
+            const [t1, t2, t3] = tel.split("-");
+            document.getElementById("tel1").value = t1;
+            document.getElementById("tel2").value = t2;
+            document.getElementById("tel3").value = t3;
+          }
+
+          const address = document.getElementById("address").value;
+          if (address && address.split("/").length >= 4) {
+            const [post, addr, detail, extra] = address.split("/");
+            document.getElementById("sample6_postcode").value = post;
+            document.getElementById("sample6_address").value = addr;
+            document.getElementById("sample6_detailAddress").value = detail;
+            document.getElementById("sample6_extraAddress").value = extra;
+          }
+        });
+
+        function mergeTel() {
+          const t1 = document.getElementById("tel1").value.trim();
+          const t2 = document.getElementById("tel2").value.trim();
+          const t3 = document.getElementById("tel3").value.trim();
+          document.getElementById("tel").value = `${t1}-${t2}-${t3}`;
+        }
+
+        function mergeAddress() {
+          const post = document.getElementById("sample6_postcode").value.trim();
+          const addr = document.getElementById("sample6_address").value.trim();
+          const detail = document.getElementById("sample6_detailAddress").value.trim();
+          const extra = document.getElementById("sample6_extraAddress").value.trim();
+          document.getElementById("address").value = `${post}/${addr}/${detail}/${extra}`;
+        }
+
+        function sendEmailCode() {
+          const email1 = document.getElementById("email1").value.trim();
+          const email2 = document.getElementById("email2").value;
+          const fullEmail = email1 + "@" + email2;
+          document.getElementById("emailInput").value = fullEmail;
+
+          fetch("/member/sendCode", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: fullEmail })
+          })
+          .then(res => res.text())
+          .then(result => {
+            if (result === "ok") {
+              alert("인증번호가 전송되었습니다.");
+              document.getElementById("emailCodeDiv").style.display = "block";
+            } else {
+              alert("이메일 전송 실패");
+            }
+          });
+        }
+
+        function checkEmailCode() {
+          const code = document.getElementById("emailCodeInput").value.trim();
+          fetch("/member/verifyCode", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code })
+          })
+          .then(res => res.text())
+          .then(result => {
+            if (result === "success") {
+              alert("이메일 인증 완료");
+              document.getElementById("emailVerified").value = "true";
+            } else {
+              alert("인증번호가 틀렸습니다.");
+            }
+          });
+        }
+
+        function sample6_execDaumPostcode() {
+          new daum.Postcode({
+            oncomplete: function(data) {
+              let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+              let extraAddr = '';
+              if (data.userSelectedType === 'R') {
+                if (data.bname !== '' && /[\uac00-\ud7af]+$/g.test(data.bname)) {
+                  extraAddr += data.bname;
+                }
+                if (data.buildingName !== '' && data.apartment === 'Y') {
+                  extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+              }
+              document.getElementById("sample6_postcode").value = data.zonecode;
+              document.getElementById("sample6_address").value = addr;
+              document.getElementById("sample6_extraAddress").value = extraAddr;
+              document.getElementById("sample6_detailAddress").focus();
+            }
+          }).open();
+        }
+
+        function validateForm() {
+          mergeTel();
+          mergeAddress();
+          return true;
+        }
+    </script>
+</th:block>
+</html>

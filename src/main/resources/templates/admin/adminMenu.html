@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="css">
+  <style>
+    .admin-container {
+      max-width: 640px;
+      margin: 100px auto;
+      padding: 40px;
+      background: #f8f9fa;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+
+    .admin-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 40px;
+    }
+
+    .admin-img {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      margin-bottom: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .admin-button-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .admin-btn {
+      width: 100%;
+      max-width: 320px;
+      background-color: #2c3e50;
+      color: #ffffff;
+      padding: 14px 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      text-decoration: none;
+    }
+
+    .admin-btn:hover {
+      background-color: #1f2f3d;
+    }
+
+    .btn-home {
+      background-color: #198754;
+      color: white;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .btn-home:hover {
+      background-color: #157347;
+    }
+  </style>
+</th:block>
+
+<div layout:fragment="content">
+  <div class="admin-container">
+    <h2 class="admin-title">관리자 메뉴</h2>
+    <div class="admin-button-wrapper">
+      <a th:href="@{/admin/member}" class="admin-btn">회원 관리</a>
+      <a th:href="@{/admin/company}" class="admin-btn">기업 리스트</a>
+      <a th:href="@{/admin/dashboard}" class="admin-btn">센서 대시보드</a>
+      <a th:href="@{/admin/deviceList}" class="admin-btn">Device List</a>
+      <a th:href="@{/sensor-chart}" class="admin-btn">데이터 차트</a>
+      <a th:href="@{/sensor/export-page}" class="admin-btn">데이터 다운로드</a>
+      <a th:href="@{/chart/report}" class="admin-btn">일간/주간/월간 리포트</a>
+
+    </div>
+
+    <a th:href="@{/}" class="btn-home">홈으로</a>
+
+    <th:block th:if="${message != null}">
+      <script th:inline="javascript">
+        alert([[${message}]]);
+      </script>
+    </th:block>
+  </div>
+</div>
+</html>

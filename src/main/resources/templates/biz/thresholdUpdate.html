@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/exampleLayout}">
+
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    let message = [[${message}]];
+    if(message != null) alert(message);
+  </script>
+</th:block>
+
+<th:block layout:fragment="css">
+  <style>
+    :root {
+      --main-color: #2c3e50;
+      --hover-color: #1f2f3d;
+      --bg-color: #f4f6f8;
+    }
+
+    .btn {
+      border-radius: 12px;
+      font-size: 0.95rem;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: var(--main-color);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--hover-color);
+    }
+
+    .threshold-form {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #f9f9f9;
+      border: 1px solid #bbb;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .threshold-form .sensor-label {
+      font-weight: 600;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .threshold-form label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      font-size: 0.9rem;
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+
+    .threshold-form input[type="number"] {
+      margin-top: 4px;
+      padding: 6px 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .threshold-form button {
+      flex: 0 0 auto;
+      padding: 8px 16px;
+      font-size: 1rem;
+      white-space: nowrap;
+      border-radius: 4px;
+    }
+  </style>
+</th:block>
+
+<div layout:fragment="content" class="container mt-5 mb-5">
+  <h4 class="mb-4 text-center" th:text="'디바이스 임계값 설정 - ' + ${deviceCode} + '(' + ${deviceDto.deviceLocation} + ')'">디바이스코드</h4>
+
+  <div th:each="threshold : ${thresholdList}">
+    <form th:action="@{/biz/thresholdUpdate/{deviceCode}/{valueNo}(deviceCode=${deviceCode}, valueNo=${threshold.valueNo})}"
+          method="post"
+          class="threshold-form">
+
+      <input type="hidden" name="companyId" th:value="${deviceDto.companyId}" />
+      <input type="hidden" name="deviceCode" th:value="${deviceCode}" />
+
+      <span class="sensor-label">
+      센서 번호: <span th:text="${threshold.valueNo}">1</span>
+    </span>
+
+      <label>
+        최소값:
+        <input type="number" name="minValue" th:value="${threshold.minValue}" />
+      </label>
+
+      <label>
+        최대값:
+        <input type="number" name="maxValue" th:value="${threshold.maxValue}" />
+      </label>
+
+      <button type="submit" class="btn btn-primary">저장</button>
+    </form>
+  </div>
+</div>
+
+</html>

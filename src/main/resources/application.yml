@@ -1,0 +1,65 @@
+# server port Setting
+server:
+  port: 60001
+#  port: 80
+
+# Context Name Setting
+#  servlet:
+#    context-path: /demo9
+
+spring:
+  application:
+    name: greenprojectA
+
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+  thymeleaf:
+    cache: false
+
+  # Database Setting(datasource setting)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/greenprojecta
+    username: root
+    password: 1234
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 여기 이메일 입력
+    password: 여기 비밀번호 입력
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.trust: smtp.gmail.com
+      mail.smtp.ssl.protocols: TLSv1.2
+      mail.debug: true
+
+    servlet:
+      multipart:
+        maxFileSize: 10MB
+        maxRequestSize: 30MB
+
+  # JPA Setting
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update  # create, update, none, create-drop....
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: false    # sql view
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  # File Upload MaxSize Setting
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+
