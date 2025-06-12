@@ -45,6 +45,9 @@
 ![EcoView 프로젝트](https://github.com/user-attachments/assets/debc044d-0d42-4abe-8642-5282d8e3db85)
 
 
+## 주요 화면 구성
+![주요화면구성１](https://github.com/user-attachments/assets/47f9ec01-5bc7-4747-ab85-ee5c6d1dd461)
+![주요화면구성２](https://github.com/user-attachments/assets/687cf271-6e7e-45d3-8e0b-0ca38137b796)
 
 
 
