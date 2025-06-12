@@ -7,7 +7,7 @@
 > 
 > 기간 : 2025.05.22 - 2025.06.04 (약 14일)
 >
-> 인원 : 4명 → 3명
+> 인원 : 3명
 
 프로젝트 PDF : https://drive.google.com/file/d/1KAhS_8GCD9tbWvRwhClcmh10NT3cThJt/view?usp=drive_link
 
