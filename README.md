@@ -9,7 +9,7 @@
 >
 > 인원 : 4명 → 3명
 
-프로젝트 PDF : https://drive.google.com/file/d/1hoKo4Axt1YAitqoxusd_h4JFu1Cdi96f/view?usp=drive_link
+프로젝트 PDF : https://drive.google.com/file/d/1KAhS_8GCD9tbWvRwhClcmh10NT3cThJt/view?usp=drive_link
 
 시연 영상 : https://youtu.be/CczpmdCrMQM
 
