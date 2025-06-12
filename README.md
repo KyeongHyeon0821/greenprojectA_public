@@ -33,18 +33,18 @@
 ![jQuery](https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 
----
+
 ## 수행 역할
 - [x] CSV 데이터 처리 및 시뮬레이터 구현
 - [x] 실시간 센서 데이터 시각화 대시보드 구현
 - [x] 디바이스 리스트 조회 및 임계값 설정 구현
 
----
+
 
 ## 팀 구성 및 역할
 ![EcoView 프로젝트](https://github.com/user-attachments/assets/debc044d-0d42-4abe-8642-5282d8e3db85)
 
----
+
 
 
 
