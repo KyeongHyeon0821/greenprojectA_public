@@ -1,0 +1,34 @@
+![EcoView 홈 화면](https://github.com/user-attachments/assets/61c22331-ea11-444b-a105-17cb6dfeeec4)
+
+# EcoView
+> Spring Boot Project
+>
+> 실시간 센서 기반 데이터 리포트 플랫폼
+> 
+> 기간 : 2025.05.22 - 2025.06.04 (약 14일)
+>
+> 인원 : 4명 → 3명
+
+프로젝트 PDF : https://drive.google.com/file/d/1hoKo4Axt1YAitqoxusd_h4JFu1Cdi96f/view?usp=drive_link
+
+시연 영상 : https://youtu.be/CczpmdCrMQM
+
+---
+
+## 기술 스택 (Tech Stack)
+
+### Back-end  
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![JPA](https://img.shields.io/badge/JPA-59666C?style=for-the-badge&logo=hibernate&logoColor=white)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)
+
+### Database  
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+
+### Front-end  
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![jQuery](https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
